@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flour & Love Bakery</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#e8a87c',secondary:'#41b3a3'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://readdy.ai/api/search-image?query=A%20warm%2C%20inviting%20bakery%20scene%20with%20freshly%20baked%20artisan%20bread%2C%20golden%20croissants%2C%20and%20colorful%20pastries%20displayed%20on%20rustic%20wooden%20tables.%20Soft%20morning%20light%20streams%20through%20large%20windows%2C%20creating%20a%20cozy%20atmosphere.%20The%20bakery%20has%20brick%20walls%2C%20hanging%20plants%2C%20and%20a%20vintage%20aesthetic.%20The%20scene%20is%20captured%20in%20a%20wide%20angle%20to%20show%20the%20full%20display%20of%20baked%20goods.&width=1920&height=1080&seq=hero1&orientation=landscape');
+            background-size: cover;
+            background-position: center;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-gap: 16px;
+        }
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 16px;
+        }
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e8a87c;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+        .custom-checkbox:checked {
+            background-color: #e8a87c;
+        }
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#home" class="text-3xl font-['Pacifico'] text-primary">logo</a>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex space-x-6">
+                <a href="#home" class="text-gray-700 hover:text-primary font-medium transition-colors">Home</a>
+                <a href="#menu" class="text-gray-700 hover:text-primary font-medium transition-colors">Menu</a>
+                <a href="#about" class="text-gray-700 hover:text-primary font-medium transition-colors">About Us</a>
+                <a href="#contact" class="text-gray-700 hover:text-primary font-medium transition-colors">Contact</a>
+            </div>
+            
+            <!-- Order Now Button (Desktop) -->
+            <div class="hidden md:block">
+                <a href="#contact" class="bg-primary text-white px-6 py-2 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all">Order Now</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden w-10 h-10 flex items-center justify-center cursor-pointer" id="mobile-menu-button">
+                <i class="ri-menu-line ri-lg"></i>
+            </div>
+        </nav>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden bg-white shadow-lg md:hidden">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+                <a href="#home" class="text-gray-700 hover:text-primary font-medium py-2 transition-colors">Home</a>
+                <a href="#menu" class="text-gray-700 hover:text-primary font-medium py-2 transition-colors">Menu</a>
+                <a href="#about" class="text-gray-700 hover:text-primary font-medium py-2 transition-colors">About Us</a>
+                <a href="#contact" class="text-gray-700 hover:text-primary font-medium py-2 transition-colors">Contact</a>
+                <a href="#contact" class="bg-primary text-white px-6 py-2 !rounded-button whitespace-nowrap text-center hover:bg-opacity-90 transition-all">Order Now</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section min-h-screen flex items-center pt-16">
+        <div class="container mx-auto px-4 w-full">
+            <div class="max-w-2xl text-white py-20">
+                <h1 class="text-5xl md:text-6xl font-['Pacifico'] mb-4">Flour & Love Bakery</h1>
+                <p class="text-xl md:text-2xl mb-8">Handcrafted baked goods made with passion since 1995</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#menu" class="bg-primary text-white px-8 py-3 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all text-lg font-medium">View Our Menu</a>
+                    <a href="#contact" class="bg-white text-primary px-8 py-3 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all text-lg font-medium">Order Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hours & Location Section -->
+    <section id="hours" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Hours & Location</h2>
+            
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Hours Card -->
+                <div class="bg-white rounded shadow-lg p-8 flex-1">
+                    <h3 class="text-2xl font-semibold mb-6 text-primary">Opening Hours</h3>
+                    <ul class="space-y-4">
+                        <li class="flex justify-between">
+                            <span class="font-medium">Monday - Friday</span>
+                            <span>7:00 AM - 7:00 PM</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="font-medium">Saturday</span>
+                            <span>7:00 AM - 8:00 PM</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="font-medium">Sunday</span>
+                            <span>8:00 AM - 6:00 PM</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-8 pt-8 border-t border-gray-200">
+                        <h4 class="text-xl font-semibold mb-4">Contact Information</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3">
+                                <div class="w-6 h-6 flex items-center justify-center mt-1">
+                                    <i class="ri-map-pin-line"></i>
+                                </div>
+                                <span>123 Bakery Street, Flourville, CA 94123</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 flex items-center justify-center">
+                                    <i class="ri-phone-line"></i>
+                                </div>
+                                <span>(555) 123-4567</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 flex items-center justify-center">
+                                    <i class="ri-mail-line"></i>
+                                </div>
+                                <span>hello@flourandlove.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Card -->
+                <div class="bg-white rounded shadow-lg p-8 flex-1">
+                    <h3 class="text-2xl font-semibold mb-6 text-primary">Find Us</h3>
+                    <div class="h-80 bg-cover bg-center rounded overflow-hidden" style="background-image: url('https://public.readdy.ai/gen_page/map_placeholder_1280x720.png')"></div>
+                    <div class="mt-6">
+                        <a href="https://maps.google.com" target="_blank" class="inline-flex items-center text-primary hover:underline">
+                            <span>Get Directions</span>
+                            <div class="w-5 h-5 flex items-center justify-center ml-1">
+                                <i class="ri-arrow-right-line"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Our Menu</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">Discover our handcrafted selection of artisanal breads, pastries, and cakes made fresh daily with locally sourced ingredients.</p>
+            
+            <!-- Filter Options -->
+            <div class="flex justify-center mb-10">
+                <div class="inline-flex p-1 bg-gray-100 rounded-full">
+                    <button class="menu-filter-btn active px-4 py-2 rounded-full whitespace-nowrap bg-primary text-white" data-filter="all">All Items</button>
+                    <button class="menu-filter-btn px-4 py-2 rounded-full whitespace-nowrap" data-filter="bread">Bread</button>
+                    <button class="menu-filter-btn px-4 py-2 rounded-full whitespace-nowrap" data-filter="pastry">Pastries</button>
+                    <button class="menu-filter-btn px-4 py-2 rounded-full whitespace-nowrap" data-filter="cake">Cakes</button>
+                    <button class="menu-filter-btn px-4 py-2 rounded-full whitespace-nowrap" data-filter="special">Specials</button>
+                </div>
+            </div>
+            
+            <!-- Dietary Filters -->
+            <div class="flex justify-center mb-10">
+                <div class="flex gap-6">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="custom-checkbox" id="gluten-free-filter">
+                        <span>Gluten-Free</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="custom-checkbox" id="vegan-filter">
+                        <span>Vegan</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Menu Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Bread Items -->
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="bread">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20rustic%20sourdough%20bread%20loaf%20with%20a%20beautifully%20scored%20crust%20on%20a%20wooden%20board%20with%20a%20light%20dusting%20of%20flour.%20The%20bread%20has%20a%20golden-brown%20exterior%20with%20a%20perfect%20crackly%20crust.%20Natural%20light%20from%20a%20window%20illuminates%20the%20bread%2C%20highlighting%20its%20texture.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=bread1&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Artisan Sourdough</h3>
+                            <span class="font-medium text-primary">$7.50</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Our signature sourdough with a perfectly chewy interior and crisp crust, fermented for 24 hours.</p>
+                        <div class="flex gap-2">
+                            <span class="bg-gray-100 text-xs px-2 py-1 rounded-full">Vegan</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="bread">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20rustic%20multigrain%20bread%20loaf%20sliced%20to%20show%20its%20texture%2C%20with%20visible%20seeds%20and%20grains%20throughout.%20The%20bread%20sits%20on%20a%20wooden%20cutting%20board%20with%20a%20bread%20knife%20nearby.%20The%20crust%20is%20golden%20brown%20and%20the%20interior%20shows%20a%20perfect%20crumb%20structure.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=bread2&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Multigrain Loaf</h3>
+                            <span class="font-medium text-primary">$8.25</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Hearty whole grain bread with flax, sunflower, and pumpkin seeds for extra nutrition and flavor.</p>
+                        <div class="flex gap-2">
+                            <span class="bg-gray-100 text-xs px-2 py-1 rounded-full">Vegan</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pastry Items -->
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="pastry">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20close-up%20of%20perfectly%20laminated%20croissants%20with%20a%20golden%2C%20flaky%20exterior%20arranged%20on%20a%20white%20ceramic%20plate.%20The%20croissants%20show%20beautiful%20layers%20when%20broken%20open%2C%20revealing%20a%20honeycomb%20structure%20inside.%20A%20light%20dusting%20of%20flour%20adds%20texture.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=pastry1&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Butter Croissant</h3>
+                            <span class="font-medium text-primary">$4.50</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Traditional French croissants with 27 layers of French butter and dough, creating a perfect flaky texture.</p>
+                    </div>
+                </div>
+                
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="pastry">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20beautiful%20pain%20au%20chocolat%20with%20visible%20layers%20of%20pastry%20and%20chocolate%20peeking%20through.%20The%20pastry%20has%20a%20glossy%2C%20golden-brown%20exterior%20with%20flaky%20layers%20visible.%20A%20light%20dusting%20of%20powdered%20sugar%20adds%20elegance.%20The%20pain%20au%20chocolat%20is%20arranged%20on%20a%20white%20ceramic%20plate%20with%20a%20small%20cup%20of%20coffee%20nearby.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=pastry2&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Pain au Chocolat</h3>
+                            <span class="font-medium text-primary">$5.25</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Flaky croissant dough filled with two batons of premium dark chocolate for the perfect balance of sweetness.</p>
+                    </div>
+                </div>
+                
+                <!-- Cake Items -->
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="cake">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20slice%20of%20elegant%20carrot%20cake%20with%20cream%20cheese%20frosting%20on%20a%20white%20plate.%20The%20cake%20shows%20visible%20specks%20of%20carrot%20and%20nuts%20throughout%20its%20moist%20layers.%20The%20frosting%20is%20smooth%20and%20has%20a%20subtle%20swirl%20pattern.%20A%20small%20fork%20rests%20beside%20the%20cake.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=cake1&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Carrot Cake</h3>
+                            <span class="font-medium text-primary">$6.75</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Moist carrot cake with walnuts, raisins and our signature cream cheese frosting.</p>
+                        <div class="flex gap-2">
+                            <span class="bg-gray-100 text-xs px-2 py-1 rounded-full">Gluten-Free Option</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="cake">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20slice%20of%20rich%20chocolate%20cake%20with%20glossy%20ganache%20frosting%20on%20a%20white%20plate.%20The%20cake%20has%20multiple%20moist%20layers%20with%20dark%20chocolate%20frosting%20between%20each%20layer.%20The%20top%20is%20decorated%20with%20a%20perfect%20chocolate%20curl.%20A%20small%20fork%20with%20a%20bite%20of%20cake%20rests%20beside%20the%20plate.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=cake2&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Chocolate Ganache Cake</h3>
+                            <span class="font-medium text-primary">$7.50</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Decadent chocolate cake layered with silky chocolate ganache and covered in a shiny chocolate glaze.</p>
+                    </div>
+                </div>
+                
+                <!-- Special Items -->
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="special">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20seasonal%20fruit%20tart%20with%20a%20golden%20pastry%20crust%20filled%20with%20vanilla%20custard%20and%20topped%20with%20an%20arrangement%20of%20fresh%20berries%20and%20sliced%20fruits.%20The%20tart%20has%20a%20perfect%20circular%20shape%20with%20a%20fluted%20edge.%20A%20light%20dusting%20of%20powdered%20sugar%20adds%20elegance.%20The%20tart%20sits%20on%20a%20white%20ceramic%20plate%20with%20a%20small%20sprig%20of%20mint%20for%20garnish.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=special1&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Seasonal Fruit Tart</h3>
+                            <span class="font-medium text-primary">$8.95</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Buttery shortcrust pastry filled with vanilla custard and topped with seasonal fresh fruits.</p>
+                        <div class="flex gap-2">
+                            <span class="bg-gray-100 text-xs px-2 py-1 rounded-full">Seasonal</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="special">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20rustic%20apple%20galette%20with%20a%20free-form%20crust%20folded%20over%20thinly%20sliced%20apples%20arranged%20in%20a%20circular%20pattern.%20The%20crust%20is%20golden%20brown%20with%20visible%20sugar%20crystals.%20A%20light%20caramel%20drizzle%20adds%20shine%20to%20the%20apples.%20The%20galette%20sits%20on%20a%20wooden%20board%20with%20a%20small%20scoop%20of%20vanilla%20ice%20cream%20melting%20beside%20it.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=special2&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Rustic Apple Galette</h3>
+                            <span class="font-medium text-primary">$7.95</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Free-form apple tart with cinnamon-spiced local apples in a flaky all-butter crust.</p>
+                        <div class="flex gap-2">
+                            <span class="bg-gray-100 text-xs px-2 py-1 rounded-full">Seasonal</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="bread" data-gluten-free="true">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20gluten-free%20bread%20loaf%20with%20a%20golden%20crust%2C%20sliced%20to%20show%20its%20airy%20texture.%20The%20bread%20has%20a%20rustic%20appearance%20with%20visible%20seeds%20on%20top.%20The%20loaf%20sits%20on%20a%20wooden%20cutting%20board%20with%20a%20bread%20knife%20nearby.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=gfbread&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Gluten-Free Sandwich Bread</h3>
+                            <span class="font-medium text-primary">$9.50</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Soft and flavorful gluten-free bread made with our special blend of alternative flours.</p>
+                        <div class="flex gap-2">
+                            <span class="bg-gray-100 text-xs px-2 py-1 rounded-full">Gluten-Free</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-item bg-white rounded shadow-lg overflow-hidden" data-category="pastry" data-vegan="true">
+                    <div class="h-64 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=Vegan%20cinnamon%20rolls%20with%20a%20swirl%20of%20cinnamon%20visible%20throughout%20and%20topped%20with%20a%20dairy-free%20glaze.%20The%20rolls%20have%20a%20soft%2C%20fluffy%20texture%20and%20golden-brown%20exterior.%20They%20are%20arranged%20on%20a%20white%20ceramic%20plate%20with%20a%20sprinkle%20of%20cinnamon%20on%20top.%20Natural%20light%20creates%20a%20warm%2C%20inviting%20atmosphere.%20The%20background%20is%20a%20clean%2C%20minimal%20kitchen%20counter%20with%20neutral%20tones.&width=600&height=400&seq=veganpastry&orientation=landscape')"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-semibold">Vegan Cinnamon Rolls</h3>
+                            <span class="font-medium text-primary">$5.95</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Plant-based cinnamon rolls with a gooey center and sweet dairy-free glaze.</p>
+                        <div class="flex gap-2">
+                            <span class="bg-gray-100 text-xs px-2 py-1 rounded-full">Vegan</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="#contact" class="bg-primary text-white px-8 py-3 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all text-lg font-medium">Place an Order</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">About Us</h2>
+            
+            <div class="flex flex-col md:flex-row gap-12 items-center mb-16">
+                <div class="md:w-1/2">
+                    <h3 class="text-2xl font-semibold mb-4 text-primary">Our Story</h3>
+                    <p class="text-gray-700 mb-4">Flour & Love Bakery began in 1995 when Emma and James Wilson, both passionate home bakers, decided to turn their hobby into a business. What started as a small counter in a local farmer's market has grown into a beloved neighborhood bakery.</p>
+                    <p class="text-gray-700 mb-4">We believe in using traditional methods and the finest ingredients. All our breads are naturally leavened and hand-shaped. We source local, organic ingredients whenever possible and maintain close relationships with farmers in our community.</p>
+                    <p class="text-gray-700">Our mission is simple: to create delicious, honest baked goods that bring joy to our customers and honor the craft of baking.</p>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="rounded-lg overflow-hidden shadow-lg">
+                        <img src="https://readdy.ai/api/search-image?query=A%20warm%2C%20inviting%20bakery%20interior%20with%20rustic%20wooden%20shelves%20filled%20with%20freshly%20baked%20bread%20loaves.%20A%20baker%20in%20an%20apron%20is%20working%20at%20a%20flour-dusted%20wooden%20counter%2C%20kneading%20dough.%20The%20space%20has%20brick%20walls%2C%20pendant%20lighting%2C%20and%20a%20vintage%20aesthetic.%20Sunlight%20streams%20through%20large%20windows%2C%20creating%20a%20cozy%20atmosphere.%20The%20scene%20captures%20the%20authentic%20craft%20of%20traditional%20baking.&width=800&height=600&seq=bakery1&orientation=landscape" alt="Our bakery" class="w-full h-auto object-cover">
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-semibold text-center mb-8 text-primary">Meet Our Team</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded shadow-lg overflow-hidden">
+                    <div class="h-80 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20professional%20portrait%20of%20a%20female%20head%20baker%20in%20her%2050s%20with%20gray-streaked%20hair%20pulled%20back%2C%20wearing%20a%20white%20chefs%20coat%20with%20rolled-up%20sleeves.%20She%20has%20a%20warm%2C%20confident%20smile%20and%20flour-dusted%20hands.%20She%20stands%20in%20a%20bakery%20kitchen%20with%20bread%20loaves%20in%20the%20background.%20Natural%20lighting%20creates%20a%20warm%2C%20authentic%20atmosphere.%20The%20portrait%20is%20professionally%20composed%20with%20a%20shallow%20depth%20of%20field.&width=600&height=800&seq=baker1&orientation=portrait')"></div>
+                    <div class="p-6">
+                        <h4 class="text-xl font-semibold mb-1">Emma Wilson</h4>
+                        <p class="text-gray-600 mb-4">Founder & Head Baker</p>
+                        <p class="text-gray-700">With over 30 years of baking experience, Emma oversees all recipes and quality control. Her sourdough is legendary in the community.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded shadow-lg overflow-hidden">
+                    <div class="h-80 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20professional%20portrait%20of%20a%20male%20pastry%20chef%20in%20his%2040s%20with%20short%20dark%20hair%20and%20glasses%2C%20wearing%20a%20white%20chefs%20coat.%20He%20has%20a%20creative%2C%20detail-oriented%20expression%20and%20is%20piping%20decoration%20onto%20a%20cake.%20He%20stands%20in%20a%20bakery%20kitchen%20with%20pastries%20in%20the%20background.%20Natural%20lighting%20creates%20a%20warm%2C%20authentic%20atmosphere.%20The%20portrait%20is%20professionally%20composed%20with%20a%20shallow%20depth%20of%20field.&width=600&height=800&seq=baker2&orientation=portrait')"></div>
+                    <div class="p-6">
+                        <h4 class="text-xl font-semibold mb-1">Michael Chen</h4>
+                        <p class="text-gray-600 mb-4">Pastry Chef</p>
+                        <p class="text-gray-700">A graduate of Le Cordon Bleu, Michael brings classical French techniques and innovative flavors to our pastry selection.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded shadow-lg overflow-hidden">
+                    <div class="h-80 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=A%20professional%20portrait%20of%20a%20young%20female%20baker%20in%20her%20late%2020s%20with%20curly%20hair%20pulled%20back%20in%20a%20bandana%2C%20wearing%20a%20flour-dusted%20apron.%20She%20has%20a%20passionate%2C%20energetic%20expression%20and%20is%20scoring%20designs%20into%20bread%20dough.%20She%20stands%20in%20a%20bakery%20kitchen%20with%20a%20wood-fired%20oven%20in%20the%20background.%20Natural%20lighting%20creates%20a%20warm%2C%20authentic%20atmosphere.%20The%20portrait%20is%20professionally%20composed%20with%20a%20shallow%20depth%20of%20field.&width=600&height=800&seq=baker3&orientation=portrait')"></div>
+                    <div class="p-6">
+                        <h4 class="text-xl font-semibold mb-1">Sophia Rodriguez</h4>
+                        <p class="text-gray-600 mb-4">Bread Baker</p>
+                        <p class="text-gray-700">Specializing in artisanal bread, Sophia is passionate about ancient grains and traditional fermentation methods.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery Section -->
+    <section id="gallery" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Gallery</h2>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item cursor-pointer" data-src="https://readdy.ai/api/search-image?query=A%20close-up%20of%20a%20bakers%20hands%20shaping%20sourdough%20bread%20dough%20on%20a%20floured%20wooden%20surface.%20The%20hands%20show%20skill%20and%20precision%20in%20the%20traditional%20craft.%20Flour%20dust%20creates%20a%20beautiful%2C%20atmospheric%20effect%20in%20the%20warm%20bakery%20lighting.%20The%20image%20captures%20the%20tactile%2C%20artisanal%20nature%20of%20bread%20making.&width=800&height=600&seq=gallery1&orientation=landscape">
+                    <img src="https://readdy.ai/api/search-image?query=A%20close-up%20of%20a%20bakers%20hands%20shaping%20sourdough%20bread%20dough%20on%20a%20floured%20wooden%20surface.%20The%20hands%20show%20skill%20and%20precision%20in%20the%20traditional%20craft.%20Flour%20dust%20creates%20a%20beautiful%2C%20atmospheric%20effect%20in%20the%20warm%20bakery%20lighting.%20The%20image%20captures%20the%20tactile%2C%20artisanal%20nature%20of%20bread%20making.&width=800&height=600&seq=gallery1&orientation=landscape" alt="Bread making" class="w-full h-auto rounded shadow-md hover:shadow-lg transition-shadow">
+                </div>
+                
+                <div class="gallery-item cursor-pointer" data-src="https://readdy.ai/api/search-image?query=A%20beautifully%20arranged%20display%20of%20various%20pastries%20in%20a%20glass%20bakery%20case.%20The%20display%20includes%20croissants%2C%20pain%20au%20chocolat%2C%20fruit%20tarts%2C%20and%20eclairs%2C%20all%20arranged%20with%20care%20and%20attention%20to%20detail.%20The%20lighting%20highlights%20the%20golden%2C%20flaky%20textures%20and%20glossy%20finishes.%20The%20image%20captures%20the%20enticing%20visual%20appeal%20of%20a%20premium%20bakery%20display.&width=800&height=1000&seq=gallery2&orientation=portrait">
+                    <img src="https://readdy.ai/api/search-image?query=A%20beautifully%20arranged%20display%20of%20various%20pastries%20in%20a%20glass%20bakery%20case.%20The%20display%20includes%20croissants%2C%20pain%20au%20chocolat%2C%20fruit%20tarts%2C%20and%20eclairs%2C%20all%20arranged%20with%20care%20and%20attention%20to%20detail.%20The%20lighting%20highlights%20the%20golden%2C%20flaky%20textures%20and%20glossy%20finishes.%20The%20image%20captures%20the%20enticing%20visual%20appeal%20of%20a%20premium%20bakery%20display.&width=800&height=1000&seq=gallery2&orientation=portrait" alt="Pastry display" class="w-full h-auto rounded shadow-md hover:shadow-lg transition-shadow">
+                </div>
+                
+                <div class="gallery-item cursor-pointer" data-src="https://readdy.ai/api/search-image?query=A%20warm%2C%20inviting%20scene%20of%20customers%20enjoying%20coffee%20and%20pastries%20at%20rustic%20wooden%20tables%20in%20the%20bakery%20cafe%20area.%20Sunlight%20streams%20through%20large%20windows%2C%20creating%20a%20cozy%20atmosphere.%20The%20space%20has%20brick%20walls%2C%20hanging%20plants%2C%20and%20a%20vintage%20aesthetic.%20Customers%20of%20various%20ages%20are%20engaged%20in%20conversation%2C%20reading%2C%20or%20simply%20enjoying%20their%20baked%20goods.%20The%20scene%20captures%20the%20community%20aspect%20of%20the%20neighborhood%20bakery.&width=800&height=600&seq=gallery3&orientation=landscape">
+                    <img src="https://readdy.ai/api/search-image?query=A%20warm%2C%20inviting%20scene%20of%20customers%20enjoying%20coffee%20and%20pastries%20at%20rustic%20wooden%20tables%20in%20the%20bakery%20cafe%20area.%20Sunlight%20streams%20through%20large%20windows%2C%20creating%20a%20cozy%20atmosphere.%20The%20space%20has%20brick%20walls%2C%20hanging%20plants%2C%20and%20a%20vintage%20aesthetic.%20Customers%20of%20various%20ages%20are%20engaged%20in%20conversation%2C%20reading%2C%20or%20simply%20enjoying%20their%20baked%20goods.%20The%20scene%20captures%20the%20community%20aspect%20of%20the%20neighborhood%20bakery.&width=800&height=600&seq=gallery3&orientation=landscape" alt="Bakery cafe" class="w-full h-auto rounded shadow-md hover:shadow-lg transition-shadow">
+                </div>
+                
+                <div class="gallery-item cursor-pointer" data-src="https://readdy.ai/api/search-image?query=A%20close-up%20of%20a%20baker%20scoring%20decorative%20patterns%20into%20bread%20dough%20before%20baking.%20The%20baker%20uses%20a%20lame%20%28bread%20scoring%20tool%29%20with%20precision%20to%20create%20beautiful%20designs.%20Flour%20dust%20creates%20a%20beautiful%2C%20atmospheric%20effect%20in%20the%20warm%20bakery%20lighting.%20The%20image%20captures%20the%20artistic%20aspect%20of%20artisanal%20bread%20making.&width=800&height=1000&seq=gallery4&orientation=portrait">
+                    <img src="https://readdy.ai/api/search-image?query=A%20close-up%20of%20a%20baker%20scoring%20decorative%20patterns%20into%20bread%20dough%20before%20baking.%20The%20baker%20uses%20a%20lame%20%28bread%20scoring%20tool%29%20with%20precision%20to%20create%20beautiful%20designs.%20Flour%20dust%20creates%20a%20beautiful%2C%20atmospheric%20effect%20in%20the%20warm%20bakery%20lighting.%20The%20image%20captures%20the%20artistic%20aspect%20of%20artisanal%20bread%20making.&width=800&height=1000&seq=gallery4&orientation=portrait" alt="Bread scoring" class="w-full h-auto rounded shadow-md hover:shadow-lg transition-shadow">
+                </div>
+                
+                <div class="gallery-item cursor-pointer" data-src="https://readdy.ai/api/search-image?query=A%20dramatic%20shot%20of%20freshly%20baked%20bread%20loaves%20being%20removed%20from%20a%20wood-fired%20brick%20oven.%20Steam%20rises%20from%20the%20perfectly%20browned%20loaves%20as%20theyre%20transferred%20to%20cooling%20racks%20with%20a%20wooden%20peel.%20The%20warm%20glow%20of%20the%20oven%20fire%20creates%20dramatic%20lighting.%20The%20image%20captures%20the%20traditional%20baking%20process%20and%20the%20moment%20of%20completion.&width=800&height=600&seq=gallery5&orientation=landscape">
+                    <img src="https://readdy.ai/api/search-image?query=A%20dramatic%20shot%20of%20freshly%20baked%20bread%20loaves%20being%20removed%20from%20a%20wood-fired%20brick%20oven.%20Steam%20rises%20from%20the%20perfectly%20browned%20loaves%20as%20theyre%20transferred%20to%20cooling%20racks%20with%20a%20wooden%20peel.%20The%20warm%20glow%20of%20the%20oven%20fire%20creates%20dramatic%20lighting.%20The%20image%20captures%20the%20traditional%20baking%20process%20and%20the%20moment%20of%20completion.&width=800&height=600&seq=gallery5&orientation=landscape" alt="Bread from oven" class="w-full h-auto rounded shadow-md hover:shadow-lg transition-shadow">
+                </div>
+                
+                <div class="gallery-item cursor-pointer" data-src="https://readdy.ai/api/search-image?query=A%20baker%20piping%20intricate%20buttercream%20decorations%20onto%20a%20celebration%20cake.%20The%20bakers%20hands%20show%20skill%20and%20artistry%20as%20they%20create%20beautiful%20floral%20designs.%20The%20cake%20is%20on%20a%20rotating%20stand%20in%20a%20well-lit%20workspace.%20Various%20piping%20tips%20and%20colored%20frostings%20are%20visible%20nearby.%20The%20image%20captures%20the%20detailed%20craftsmanship%20of%20cake%20decoration.&width=800&height=600&seq=gallery6&orientation=landscape">
+                    <img src="https://readdy.ai/api/search-image?query=A%20baker%20piping%20intricate%20buttercream%20decorations%20onto%20a%20celebration%20cake.%20The%20bakers%20hands%20show%20skill%20and%20artistry%20as%20they%20create%20beautiful%20floral%20designs.%20The%20cake%20is%20on%20a%20rotating%20stand%20in%20a%20well-lit%20workspace.%20Various%20piping%20tips%20and%20colored%20frostings%20are%20visible%20nearby.%20The%20image%20captures%20the%20detailed%20craftsmanship%20of%20cake%20decoration.&width=800&height=600&seq=gallery6&orientation=landscape" alt="Cake decorating" class="w-full h-auto rounded shadow-md hover:shadow-lg transition-shadow">
+                </div>
+            </div>
+            
+            <!-- Lightbox -->
+            <div class="lightbox" id="lightbox">
+                <div class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-white rounded-full cursor-pointer" id="close-lightbox">
+                    <i class="ri-close-line ri-lg"></i>
+                </div>
+                <img src="" alt="Enlarged gallery image" class="lightbox-content" id="lightbox-image">
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section id="contact" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4">Contact Us</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">Have a question or want to place an order? Fill out the form below and we'll get back to you as soon as possible.</p>
+            
+            <div class="max-w-2xl mx-auto bg-white rounded shadow-lg p-8">
+                <form id="contact-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="name" class="block text-gray-700 font-medium mb-2">Name</label>
+                            <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    
+                    <div>
+                        <label for="subject" class="block text-gray-700 font-medium mb-2">Subject</label>
+                        <select id="subject" name="subject" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8">
+                            <option value="general">General Inquiry</option>
+                            <option value="order">Place an Order</option>
+                            <option value="catering">Catering Request</option>
+                            <option value="feedback">Feedback</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="message" class="block text-gray-700 font-medium mb-2">Message</label>
+                        <textarea id="message" name="message" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required></textarea>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <input type="checkbox" id="order-checkbox" name="order-checkbox" class="custom-checkbox mt-1">
+                        <label for="order-checkbox" class="ml-2 text-gray-700">I'm interested in placing a special order (cakes, large quantities, etc.)</label>
+                    </div>
+                    
+                    <div id="order-details" class="hidden space-y-6 pt-4 border-t border-gray-200">
+                        <div>
+                            <label for="order-type" class="block text-gray-700 font-medium mb-2">Order Type</label>
+                            <select id="order-type" name="order-type" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8">
+                                <option value="cake">Custom Cake</option>
+                                <option value="pastries">Pastries (Bulk)</option>
+                                <option value="bread">Bread (Bulk)</option>
+                                <option value="catering">Catering Package</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="order-date" class="block text-gray-700 font-medium mb-2">Desired Pickup Date</label>
+                            <input type="date" id="order-date" name="order-date" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label for="order-details-text" class="block text-gray-700 font-medium mb-2">Order Details</label>
+                            <textarea id="order-details-text" name="order-details-text" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Please provide details about your order (size, flavors, quantity, etc.)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center">
+                        <button type="submit" class="bg-primary text-white px-8 py-3 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all text-lg font-medium">Send Message</button>
+                    </div>
+                </form>
+                
+                <!-- Form Success Message (hidden by default) -->
+                <div id="form-success" class="hidden mt-6 p-4 bg-green-100 text-green-700 rounded">
+                    <div class="flex items-center">
+                        <div class="w-6 h-6 flex items-center justify-center mr-2">
+                            <i class="ri-check-line"></i>
+                        </div>
+                        <p>Your message has been sent successfully! We'll get back to you soon.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-['Pacifico'] mb-4">logo</h3>
+                    <p class="text-gray-300 mb-4">Handcrafted baked goods made with passion since 1995.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full">
+                            <i class="ri-facebook-fill"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full">
+                            <i class="ri-instagram-fill"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition-colors w-10 h-10 flex items-center justify-center bg-gray-700 rounded-full">
+                            <i class="ri-twitter-x-fill"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-300 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#menu" class="text-gray-300 hover:text-white transition-colors">Menu</a></li>
+                        <li><a href="#about" class="text-gray-300 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#gallery" class="text-gray-300 hover:text-white transition-colors">Gallery</a></li>
+                        <li><a href="#contact" class="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Hours</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>Monday - Friday: 7:00 AM - 7:00 PM</li>
+                        <li>Saturday: 7:00 AM - 8:00 PM</li>
+                        <li>Sunday: 8:00 AM - 6:00 PM</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+                    <p class="text-gray-300 mb-4">Subscribe to receive updates on seasonal offerings and events.</p>
+                    <form class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l text-gray-800 border-none focus:outline-none focus:ring-2 focus:ring-primary">
+                        <button type="submit" class="bg-primary text-white px-4 py-2 !rounded-r-button whitespace-nowrap hover:bg-opacity-90 transition-all">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2025 Flour & Love Bakery. All rights reserved.</p>
+                
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox Script -->
+    <script id="lightbox-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightbox-image');
+            const closeLightbox = document.getElementById('close-lightbox');
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            
+            galleryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const imgSrc = this.getAttribute('data-src');
+                    lightboxImage.src = imgSrc;
+                    lightbox.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+            
+            closeLightbox.addEventListener('click', function() {
+                lightbox.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+            
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox) {
+                    lightbox.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+    </script>
+
+    <!-- Menu Filter Script -->
+    <script id="menu-filter-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtns = document.querySelectorAll('.menu-filter-btn');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const glutenFreeFilter = document.getElementById('gluten-free-filter');
+            const veganFilter = document.getElementById('vegan-filter');
+            
+            // Category filter
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-primary', 'text-white');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Show/hide menu items based on category
+                    menuItems.forEach(item => {
+                        if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                            applyDietaryFilters(item);
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Dietary filters
+            function applyDietaryFilters(item) {
+                const isGlutenFree = glutenFreeFilter.checked;
+                const isVegan = veganFilter.checked;
+                
+                if (isGlutenFree && !item.hasAttribute('data-gluten-free')) {
+                    item.style.display = 'none';
+                } else if (isVegan && !item.hasAttribute('data-vegan')) {
+                    item.style.display = 'none';
+                } else {
+                    item.style.display = 'block';
+                }
+            }
+            
+            glutenFreeFilter.addEventListener('change', function() {
+                const activeFilter = document.querySelector('.menu-filter-btn.active').getAttribute('data-filter');
+                
+                menuItems.forEach(item => {
+                    if (activeFilter === 'all' || item.getAttribute('data-category') === activeFilter) {
+                        applyDietaryFilters(item);
+                    }
+                });
+            });
+            
+            veganFilter.addEventListener('change', function() {
+                const activeFilter = document.querySelector('.menu-filter-btn.active').getAttribute('data-filter');
+                
+                menuItems.forEach(item => {
+                    if (activeFilter === 'all' || item.getAttribute('data-category') === activeFilter) {
+                        applyDietaryFilters(item);
+                    }
+                });
+            });
+        });
+    </script>
+    <!-- Mobile Menu Script -->
+    <script id="mobile-menu-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                if (mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.remove('hidden');
+                } else {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+            
+            // Close mobile menu when clicking a link
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        });
+    </script>
+
+    <!-- Contact Form Script -->
+    <script id="contact-form-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const orderCheckbox = document.getElementById('order-checkbox');
+            const orderDetails = document.getElementById('order-details');
+            const contactForm = document.getElementById('contact-form');
+            const formSuccess = document.getElementById('form-success');
+            
+            // Toggle order details section
+            orderCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    orderDetails.classList.remove('hidden');
+                } else {
+                    orderDetails.classList.add('hidden');
+                }
+            });
+            
+            // Form submission
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate form submission (in a real application, you would send data to server)
+                setTimeout(function() {
+                    contactForm.reset();
+                    orderDetails.classList.add('hidden');
+                    formSuccess.classList.remove('hidden');
+                    
+                    // Hide success message after 5 seconds
+                    setTimeout(function() {
+                        formSuccess.classList.add('hidden');
+                    }, 5000);
+                }, 1000);
+            });
+            
+            // Update subject when selecting order checkbox
+            orderCheckbox.addEventListener('change', function() {
+                const subjectSelect = document.getElementById('subject');
+                if (this.checked) {
+                    subjectSelect.value = 'order';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
